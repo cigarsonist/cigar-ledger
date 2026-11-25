@@ -13,8 +13,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- SheetJS for real Excel (.xlsx) Export -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- ExcelJS for true Excel (.xlsx) Export with Embedded Images -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     
     <!-- Google Fonts: Inter & Playfair Display -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -390,17 +390,17 @@
                     </div>
                     <p id="folder-help-note" class="text-[11px] text-stone-400 leading-snug">
                         Tip: Pick a custom folder (like <span class="text-stone-300">Documents/Cigar Logs</span>) or tap <span class="text-stone-300">Ask Location Each Time</span> to pick a folder/Drive on export.
-                    </p>
-                </div>
-
-                <!-- Option 1: Excel (.xlsx) -->
-                <button onclick="exportToExcel()" class="w-full text-left p-4 rounded-2xl bg-cedar-850 hover:bg-cedar-800 border border-cedar-700 transition flex items-center gap-4">
-                    <div class="w-11 h-11 rounded-xl bg-emerald-950 border border-emerald-700/50 text-emerald-400 flex items-center justify-center shrink-0 font-bold text-xs">
+                <!-- Option 1: Excel (.xlsx) with Embedded Photos -->
+                <button id="btn-export-xlsx" onclick="exportToExcel()" class="w-full text-left p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 to-cedar-850 hover:from-emerald-900/80 hover:to-cedar-800 border border-emerald-600/50 transition flex items-center gap-4 shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-emerald-950 border border-emerald-500/50 text-emerald-300 flex items-center justify-center shrink-0 font-bold text-xs">
                         XLSX
                     </div>
                     <div class="flex-1">
-                        <div class="font-bold text-sm text-amber-50">Export to Excel / Google Sheets (.xlsx)</div>
-                        <div class="text-xs text-stone-400 mt-0.5">Clean spreadsheet with Cigar Name, Size, Price, Buy Again & Date. Opens directly in Excel or Google Sheets.</div>
+                        <div class="flex items-center gap-2">
+                            <span id="btn-export-xlsx-title" class="font-bold text-sm text-amber-50">Export to Excel with Photos (.xlsx)</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Photos Included</span>
+                        </div>
+                        <div class="text-xs text-stone-300 mt-0.5">Embeds your cigar photos directly inside the spreadsheet cells alongside Name, Size, Price, Buy Again & Date.</div>
                     </div>
                 </button>
 
@@ -967,44 +967,198 @@
             showToast('Reset to Default Downloads folder');
         }
 
+        // Convert any data URL (JPEG, PNG, or SVG sample artwork) into a clean base64 JPEG/PNG for ExcelJS
+        async function normalizeImageForExcel(dataUrl) {
+            if (!dataUrl || typeof dataUrl !== 'string') return null;
+
+            // Direct JPEG or PNG data URL
+            const directMatch = dataUrl.match(/^data:image\/(jpeg|jpg|png);base64,(.+)$/i);
+            if (directMatch) {
+                const ext = directMatch[1].toLowerCase() === 'jpg' ? 'jpeg' : directMatch[1].toLowerCase();
+                return { base64: directMatch[2], extension: ext };
+            }
+
+            // Rasterize SVG data URLs (such as sample cigar art) to PNG via canvas
+            if (dataUrl.startsWith('data:image/svg+xml')) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = 360;
+                            canvas.height = 240;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            const pngDataUrl = canvas.toDataURL('image/png');
+                            const base64 = pngDataUrl.split(',')[1];
+                            resolve(base64 ? { base64, extension: 'png' } : null);
+                        } catch (e) {
+                            resolve(null);
+                        }
+                    };
+                    img.onerror = () => resolve(null);
+                    img.src = dataUrl;
+                });
+            }
+
+            return null;
+        }
+
         async function exportToExcel() {
             if (cigars.length === 0) {
                 showToast('No cigars to export yet!');
                 return;
             }
-            if (typeof XLSX === 'undefined') {
+            if (typeof ExcelJS === 'undefined') {
+                showToast('Excel engine still loading — exporting CSV fallback...');
                 await exportToCSV();
                 return;
             }
 
-            const rows = cigars.map(c => ({
-                'Date': c.date,
-                'Cigar Name': c.name,
-                'Size / Vitola': c.size,
-                'Price Paid ($)': Number(c.price || 0),
-                'Worth Buying Again': c.buyAgain ? 'Yes' : 'No',
-                'Tasting Notes': c.notes || ''
-            }));
+            const exportBtn = document.getElementById('btn-export-xlsx');
+            const exportTitle = document.getElementById('btn-export-xlsx-title');
+            const originalTitle = exportTitle ? exportTitle.textContent : 'Export to Excel with Photos (.xlsx)';
 
-            const worksheet = XLSX.utils.json_to_sheet(rows);
-            worksheet['!cols'] = [
-                { wch: 12 },
-                { wch: 32 },
-                { wch: 20 },
-                { wch: 15 },
-                { wch: 20 },
-                { wch: 40 }
-            ];
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Cigar Log');
+            if (exportBtn) exportBtn.disabled = true;
+            if (exportTitle) exportTitle.textContent = 'Embedding photos into Excel...';
 
-            const filename = `Cigar-Ledger-${new Date().toISOString().split('T')[0]}.xlsx`;
-            const xlsxBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            const blob = new Blob([xlsxBuffer], {
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            });
+            try {
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = 'Cigar Ledger';
+                workbook.created = new Date();
 
-            await saveExportBlob(blob, filename, 'Excel (.xlsx)', '.xlsx');
+                const worksheet = workbook.addWorksheet('Cigar Log', {
+                    views: [{ state: 'frozen', ySplit: 1 }]
+                });
+
+                // Define columns: Photo first, followed by text & currency columns
+                worksheet.columns = [
+                    { header: 'Photo', key: 'photo', width: 22 },
+                    { header: 'Date', key: 'date', width: 14 },
+                    { header: 'Cigar Name', key: 'name', width: 32 },
+                    { header: 'Size / Vitola', key: 'size', width: 22 },
+                    { header: 'Price Paid', key: 'price', width: 15 },
+                    { header: 'Worth Buying Again', key: 'buyAgain', width: 20 },
+                    { header: 'Tasting Notes', key: 'notes', width: 42 }
+                ];
+
+                // Style Header Row (Deep Cedar background with bold Gold/Cream text)
+                const headerRow = worksheet.getRow(1);
+                headerRow.height = 30;
+                headerRow.eachCell((cell) => {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FF2B1D15' }
+                    };
+                    cell.font = {
+                        name: 'Calibri',
+                        size: 11,
+                        bold: true,
+                        color: { argb: 'FFF3C669' }
+                    };
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FF573B2C' } },
+                        bottom: { style: 'medium', color: { argb: 'FFD99B26' } },
+                        left: { style: 'thin', color: { argb: 'FF573B2C' } },
+                        right: { style: 'thin', color: { argb: 'FF573B2C' } }
+                    };
+                });
+
+                // Populate rows & embed images
+                for (let i = 0; i < cigars.length; i++) {
+                    const c = cigars[i];
+                    const rowIndex = i + 2; // 1-indexed; row 1 is header
+                    const normalizedImg = await normalizeImageForExcel(c.photo);
+
+                    const row = worksheet.addRow({
+                        photo: normalizedImg ? '' : 'No photo',
+                        date: c.date || '',
+                        name: c.name || '',
+                        size: c.size || 'Standard',
+                        price: Number(c.price || 0),
+                        buyAgain: c.buyAgain ? 'Yes' : 'No',
+                        notes: c.notes || ''
+                    });
+
+                    // Tall row height when photo is present so thumbnail fits cleanly
+                    row.height = normalizedImg ? 102 : 28;
+
+                    const isEvenRow = i % 2 === 1;
+                    row.eachCell((cell, colNumber) => {
+                        cell.font = {
+                            name: 'Calibri',
+                            size: 11,
+                            color: { argb: 'FF1F2937' },
+                            bold: colNumber === 3 || colNumber === 5
+                        };
+
+                        if (isEvenRow) {
+                            cell.fill = {
+                                type: 'pattern',
+                                pattern: 'solid',
+                                fgColor: { argb: 'FFFAF7F4' }
+                            };
+                        }
+
+                        cell.border = {
+                            top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                            bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                            left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                            right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
+                        };
+
+                        // Column-specific formatting & alignment
+                        if (colNumber === 1 || colNumber === 2 || colNumber === 6) {
+                            cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                        } else if (colNumber === 5) {
+                            cell.numFmt = '$#,##0.00';
+                            cell.alignment = { vertical: 'middle', horizontal: 'right' };
+                        } else {
+                            cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+                        }
+
+                        // Highlight Buy Again cell badge color
+                        if (colNumber === 6) {
+                            cell.font = {
+                                name: 'Calibri',
+                                size: 11,
+                                bold: true,
+                                color: { argb: c.buyAgain ? 'FF166534' : 'FF991B1B' }
+                            };
+                        }
+                    });
+
+                    // Embed actual image inside the Photo cell (Column A = index 0)
+                    if (normalizedImg) {
+                        const imageId = workbook.addImage({
+                            base64: normalizedImg.base64,
+                            extension: normalizedImg.extension
+                        });
+
+                        worksheet.addImage(imageId, {
+                            tl: { col: 0.12, row: rowIndex - 1 + 0.08 },
+                            ext: { width: 132, height: 118 },
+                            editAs: 'oneCell'
+                        });
+                    }
+                }
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                const filename = `Cigar-Ledger-Photos-${new Date().toISOString().split('T')[0]}.xlsx`;
+                const blob = new Blob([buffer], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                });
+
+                await saveExportBlob(blob, filename, 'Excel with Photos (.xlsx)', '.xlsx');
+            } catch (err) {
+                console.error('Excel export failed:', err);
+                showToast('Error building Excel file. Try again or export HTML/CSV.');
+            } finally {
+                if (exportBtn) exportBtn.disabled = false;
+                if (exportTitle) exportTitle.textContent = originalTitle;
+            }
         }
 
         async function exportToCSV() {
