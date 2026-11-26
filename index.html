@@ -285,4 +285,1070 @@
 
                 <!-- Tasting Notes -->
                 <div>
-                    <
+                    <label for="cigar-notes" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Tasting Notes</label>
+                    <textarea id="cigar-notes" rows="2" placeholder="Flavor notes, draw, burn quality, where bought..." class="w-full px-4 py-2.5 rounded-xl bg-cedar-950 border border-cedar-700 text-sm text-white placeholder-stone-500 focus:outline-none focus:border-gold-500"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-2 pb-1">
+                    <button type="submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 text-cedar-950 font-bold text-sm shadow-lg transition">
+                        Save Cigar Entry
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 2: CIGAR DETAIL VIEW                                            -->
+    <!-- ===================================================================== -->
+    <div id="detail-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-cedar-900 border-t sm:border border-cedar-700 w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[88dvh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="relative bg-cedar-950 shrink-0">
+                <img id="detail-photo" src="" alt="Cigar photo" class="w-full h-60 object-cover">
+                <button onclick="closeDetailModal()" aria-label="Close detail" class="absolute top-3 right-3 p-2.5 rounded-full bg-black/70 text-white hover:bg-black border border-white/15">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                <div id="detail-badge" class="absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md"></div>
+            </div>
+
+            <div class="p-5 overflow-y-auto space-y-4">
+                <div>
+                    <div class="flex items-start justify-between gap-3">
+                        <h2 id="detail-name" class="font-serif text-2xl font-bold text-amber-50"></h2>
+                        <span id="detail-price" class="text-xl font-bold text-gold-400 whitespace-nowrap"></span>
+                    </div>
+                    <p id="detail-meta" class="text-xs text-stone-400 mt-1"></p>
+                </div>
+
+                <div id="detail-notes-box" class="p-3.5 rounded-2xl bg-cedar-950 border border-cedar-800">
+                    <div class="text-[11px] uppercase tracking-wider text-stone-400 font-semibold mb-1">Tasting Notes</div>
+                    <p id="detail-notes" class="text-sm text-stone-200 leading-relaxed"></p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <button id="detail-edit-btn" class="py-3 px-4 rounded-xl bg-cedar-800 hover:bg-cedar-700 text-amber-100 font-semibold text-sm border border-cedar-700 transition">
+                        Edit Entry
+                    </button>
+                    <button id="detail-delete-btn" class="py-3 px-4 rounded-xl bg-red-950/70 hover:bg-red-900/80 text-red-200 font-semibold text-sm border border-red-800/50 transition">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 3: EXPORT & BACKUP CENTER (Primary Exports at Top!)             -->
+    <!-- ===================================================================== -->
+    <div id="export-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-cedar-900 border-t sm:border border-cedar-700 w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[88dvh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-5 py-3.5 border-b border-cedar-800 flex items-center justify-between shrink-0 bg-cedar-900">
+                <div>
+                    <h2 class="font-serif text-lg font-bold text-amber-50">Export & Backup</h2>
+                    <p class="text-xs text-stone-400">Export spreadsheets with embedded cigar photos</p>
+                </div>
+                <button onclick="closeExportModal()" aria-label="Close export modal" class="p-2 rounded-xl bg-cedar-800 text-stone-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Scrollable Modal Body -->
+            <div class="p-4 overflow-y-auto space-y-4">
+                
+                <!-- 1. PRIMARY EXPORTS (Right at the top - zero scrolling needed!) -->
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between px-0.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400">Primary Exports</span>
+                        <span class="text-[11px] text-emerald-400 font-semibold">Photos Included</span>
+                    </div>
+
+                    <!-- Gold Primary Button: Export Excel with Photos (.xlsx) -->
+                    <button type="button" id="btn-export-xlsx" onclick="exportToExcel()" class="w-full text-left p-3.5 rounded-2xl bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 active:scale-[0.99] transition flex items-center gap-3.5 shadow-lg shadow-amber-950/50 text-cedar-950">
+                        <div class="w-11 h-11 rounded-xl bg-cedar-950 text-gold-400 flex items-center justify-center shrink-0 font-extrabold text-xs tracking-tight shadow-inner">
+                            .XLSX
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span id="btn-export-xlsx-title" class="font-extrabold text-sm text-cedar-950 leading-tight">Export Excel with Photos (.xlsx)</span>
+                            </div>
+                            <p class="text-xs text-cedar-900 font-medium mt-0.5 leading-snug">
+                                Embeds cigar photos inside spreadsheet rows with Name, Size, Price & Buy Again.
+                            </p>
+                        </div>
+                    </button>
+
+                    <!-- Secondary Prominent Button: Export Photo + Text Report (.html) -->
+                    <button type="button" id="btn-export-html" onclick="exportVisualHTML()" class="w-full text-left p-3.5 rounded-2xl bg-cedar-850 hover:bg-cedar-800 active:scale-[0.99] border border-gold-500/35 transition flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-amber-950 border border-gold-500/40 text-gold-400 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold text-sm text-amber-50 leading-tight">Export Photo + Text Report (.html)</div>
+                            <p class="text-xs text-stone-400 mt-0.5 leading-snug">
+                                Clean standalone printable table with embedded photos & notes.
+                            </p>
+                        </div>
+                    </button>
+
+                    <!-- Compact Row: CSV, Full Backup (.json), Restore Backup -->
+                    <div class="grid grid-cols-3 gap-2 pt-0.5">
+                        <button type="button" onclick="exportToCSV()" class="py-2.5 px-2 rounded-xl bg-cedar-800 hover:bg-cedar-700 border border-cedar-700 text-xs font-semibold text-sky-300 text-center transition">
+                            Export CSV (.csv)
+                        </button>
+                        <button type="button" onclick="exportBackupJSON()" class="py-2.5 px-2 rounded-xl bg-cedar-800 hover:bg-cedar-700 border border-cedar-700 text-xs font-semibold text-amber-200 text-center transition">
+                            Full Backup (.json)
+                        </button>
+                        <label class="cursor-pointer py-2.5 px-2 rounded-xl bg-cedar-800 hover:bg-cedar-700 border border-cedar-700 text-xs font-semibold text-stone-200 text-center flex items-center justify-center transition">
+                            <span>Restore Backup</span>
+                            <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 2. COMPACT BOTTOM SECTION: SAVE LOCATION & STORAGE -->
+                <details class="group rounded-2xl bg-cedar-950 border border-cedar-800 overflow-hidden" open>
+                    <summary class="cursor-pointer list-none px-3.5 py-2.5 flex items-center justify-between gap-2 select-none">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <svg class="w-4 h-4 text-gold-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+                            </svg>
+                            <div class="truncate">
+                                <span class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block">Save Location & Storage</span>
+                                <span id="export-folder-label" class="text-xs font-bold text-amber-100 truncate block">Default Downloads Folder</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span id="export-mode-badge" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cedar-800 text-stone-300 border border-cedar-700">
+                                Standard
+                            </span>
+                            <svg class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </summary>
+
+                    <div class="px-3.5 pb-3 pt-1 border-t border-cedar-800/70 space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="chooseExportFolder()" class="py-2 px-2.5 rounded-xl bg-gold-500/15 hover:bg-gold-500/25 text-gold-400 border border-gold-500/40 text-xs font-semibold flex items-center justify-center gap-1 transition">
+                                <span id="choose-folder-btn-text">+ Choose Folder</span>
+                            </button>
+                            <button type="button" id="toggle-save-as-btn" onclick="toggleSaveMode()" class="py-2 px-2.5 rounded-xl bg-cedar-800 hover:bg-cedar-700 text-stone-200 border border-cedar-700 text-xs font-semibold transition">
+                                Ask Location Each Time
+                            </button>
+                        </div>
+
+                        <div id="folder-reset-row" class="hidden flex items-center justify-between pt-1">
+                            <span class="text-[11px] text-emerald-400">✓ Saving directly to chosen folder</span>
+                            <button type="button" onclick="resetExportFolder()" class="text-[11px] font-semibold text-stone-400 hover:text-amber-200 underline">
+                                Reset to Default
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[11px] text-stone-400 pt-0.5">
+                            <span>Device Storage Used: <strong id="storage-usage" class="text-amber-200">0 KB</strong></span>
+                            <span>Local Offline Storage</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- Non-blocking Toast Notification -->
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-stone-900 text-amber-100 text-xs font-semibold border border-gold-500/40 shadow-2xl opacity-0 pointer-events-none transition-opacity duration-200 whitespace-nowrap">
+        Saved!
+    </div>
+
+    <script>
+        // =========================================================================
+        // STATE & STORAGE MANAGEMENT
+        // =========================================================================
+        const STORAGE_KEY = 'cigar_ledger_entries_v1';
+        const INIT_FLAG_KEY = 'cigar_ledger_initialized';
+        let cigars = [];
+        let currentFilter = 'all'; // 'all' | 'yes' | 'no'
+        let searchQuery = '';
+        let currentPhotoDataUrl = '';
+        let currentBuyAgain = true;
+
+        // Custom Export Destination State
+        let selectedDirectoryHandle = null;
+        let exportSaveMode = 'default'; // 'default' | 'directory' | 'ask'
+
+        // Initialize app on load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            if (cigars.length === 0 && !localStorage.getItem(INIT_FLAG_KEY)) {
+                loadSampleData(false);
+                localStorage.setItem(INIT_FLAG_KEY, 'true');
+            }
+            renderApp();
+        });
+
+        function loadFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                cigars = raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                console.error('Failed to read storage:', e);
+                cigars = [];
+            }
+        }
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(cigars));
+                return true;
+            } catch (e) {
+                showToast('Storage full! Export a backup & delete old entries.');
+                return false;
+            }
+        }
+
+        // =========================================================================
+        // SAMPLE DATA GENERATOR (Inline SVG artwork, no external image URLs)
+        // =========================================================================
+        function createSampleCigarImage(title, bandColor, accentColor) {
+            const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+                <defs>
+                    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#2b1b12"/>
+                        <stop offset="100%" stop-color="#140c08"/>
+                    </linearGradient>
+                    <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#7c4a27"/>
+                        <stop offset="50%" stop-color="#5c3317"/>
+                        <stop offset="100%" stop-color="#3d200d"/>
+                    </linearGradient>
+                </defs>
+                <rect width="600" height="400" fill="url(#bg)"/>
+                <circle cx="300" cy="200" r="145" fill="none" stroke="${accentColor}" stroke-opacity="0.18" stroke-width="2"/>
+                <g transform="rotate(-18 300 200)">
+                    <rect x="95" y="172" width="410" height="56" rx="26" fill="url(#leaf)" stroke="#291407" stroke-width="2"/>
+                    <rect x="245" y="171" width="68" height="58" fill="${bandColor}" stroke="${accentColor}" stroke-width="3"/>
+                    <circle cx="279" cy="200" r="16" fill="none" stroke="${accentColor}" stroke-width="2.5"/>
+                </g>
+                <text x="300" y="345" fill="#f5deb3" font-family="Georgia, serif" font-size="22" font-weight="bold" text-anchor="middle">${title}</text>
+                <text x="300" y="370" fill="#a8a29e" font-family="sans-serif" font-size="13" text-anchor="middle">Sample Humidor Photo</text>
+            </svg>`;
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.trim());
+        }
+
+        function loadSampleData(notify = true) {
+            const today = new Date().toISOString().split('T')[0];
+            const samples = [
+                {
+                    id: 'sample-1',
+                    isSample: true,
+                    name: 'Padron 1964 Anniversary Exclusivo',
+                    size: 'Robusto (5x50)',
+                    price: 22.50,
+                    buyAgain: true,
+                    date: today,
+                    notes: 'Rich cocoa, espresso, and cedar with effortless draw. Box-worthy.',
+                    photo: createSampleCigarImage('Padron 1964 Anniversary', '#7f1d1d', '#f3c669')
+                },
+                {
+                    id: 'sample-2',
+                    isSample: true,
+                    name: 'Oliva Serie V Melanio',
+                    size: 'Torpedo (6.1x52)',
+                    price: 16.00,
+                    buyAgain: true,
+                    date: today,
+                    notes: 'Smooth leather, toasted nuts, and balanced white pepper finish.',
+                    photo: createSampleCigarImage('Oliva Serie V Melanio', '#1e3a2f', '#d99b26')
+                }
+            ];
+            cigars = [...samples, ...cigars];
+            saveToStorage();
+            renderApp();
+            if (notify) showToast('2 sample cigars loaded');
+        }
+
+        function clearSampleData() {
+            cigars = cigars.filter(c => !c.isSample);
+            saveToStorage();
+            renderApp();
+            showToast('Sample entries removed');
+        }
+
+        // =========================================================================
+        // IMAGE COMPRESSION (Max 600px, JPEG 0.78 quality for localStorage)
+        // =========================================================================
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Compress to JPEG 0.78 quality
+                    currentPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.78);
+                    showPhotoPreview(currentPhotoDataUrl);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showPhotoPreview(src) {
+            if (!src) {
+                removePhoto();
+                return;
+            }
+            document.getElementById('photo-preview').src = src;
+            document.getElementById('photo-placeholder').classList.add('hidden');
+            document.getElementById('photo-preview-container').classList.remove('hidden');
+        }
+
+        function removePhoto() {
+            currentPhotoDataUrl = '';
+            document.getElementById('photo-input').value = '';
+            document.getElementById('photo-preview').src = '';
+            document.getElementById('photo-preview-container').classList.add('hidden');
+            document.getElementById('photo-placeholder').classList.remove('hidden');
+        }
+
+        // =========================================================================
+        // ADD / EDIT / DELETE CIGAR LOGIC
+        // =========================================================================
+        function openEntryModal(editId = null) {
+            const form = document.getElementById('cigar-form');
+            form.reset();
+            removePhoto();
+
+            if (editId) {
+                const entry = cigars.find(c => c.id === editId);
+                if (!entry) return;
+                document.getElementById('entry-modal-title').textContent = 'Edit Cigar Entry';
+                document.getElementById('entry-id').value = entry.id;
+                document.getElementById('cigar-name').value = entry.name;
+                document.getElementById('cigar-size').value = entry.size || '';
+                document.getElementById('cigar-price').value = entry.price !== null ? entry.price : '';
+                document.getElementById('cigar-date').value = entry.date || new Date().toISOString().split('T')[0];
+                document.getElementById('cigar-notes').value = entry.notes || '';
+                setBuyAgain(entry.buyAgain);
+                if (entry.photo) {
+                    currentPhotoDataUrl = entry.photo;
+                    showPhotoPreview(entry.photo);
+                }
+            } else {
+                document.getElementById('entry-modal-title').textContent = 'Log a Cigar';
+                document.getElementById('entry-id').value = '';
+                document.getElementById('cigar-date').value = new Date().toISOString().split('T')[0];
+                setBuyAgain(true);
+            }
+
+            document.getElementById('entry-modal').classList.remove('hidden');
+        }
+
+        function closeEntryModal() {
+            document.getElementById('entry-modal').classList.add('hidden');
+        }
+
+        function setSizePreset(preset) {
+            document.getElementById('cigar-size').value = preset;
+        }
+
+        function setBuyAgain(value) {
+            currentBuyAgain = value;
+            const yesBtn = document.getElementById('btn-buy-yes');
+            const noBtn = document.getElementById('btn-buy-no');
+
+            if (value) {
+                yesBtn.className = 'py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/70 text-emerald-300 font-bold text-sm flex items-center justify-center gap-2 transition';
+                noBtn.className = 'py-3 px-4 rounded-xl border-2 border-cedar-700 bg-cedar-950 text-stone-400 font-bold text-sm flex items-center justify-center gap-2 transition';
+            } else {
+                yesBtn.className = 'py-3 px-4 rounded-xl border-2 border-cedar-700 bg-cedar-950 text-stone-400 font-bold text-sm flex items-center justify-center gap-2 transition';
+                noBtn.className = 'py-3 px-4 rounded-xl border-2 border-red-500 bg-red-950/70 text-red-300 font-bold text-sm flex items-center justify-center gap-2 transition';
+            }
+        }
+
+        function saveCigarEntry(event) {
+            event.preventDefault();
+            const id = document.getElementById('entry-id').value;
+            const name = document.getElementById('cigar-name').value.trim();
+            const size = document.getElementById('cigar-size').value.trim();
+            const priceRaw = document.getElementById('cigar-price').value;
+            const price = priceRaw !== '' ? parseFloat(priceRaw) : 0;
+            const date = document.getElementById('cigar-date').value || new Date().toISOString().split('T')[0];
+            const notes = document.getElementById('cigar-notes').value.trim();
+
+            if (!name) return;
+
+            const fallbackPhoto = createSampleCigarImage(name, '#573b2c', '#d99b26');
+            const entryData = {
+                id: id || 'cigar-' + Date.now(),
+                isSample: false,
+                name,
+                size: size || 'Standard',
+                price,
+                buyAgain: currentBuyAgain,
+                date,
+                notes,
+                photo: currentPhotoDataUrl || fallbackPhoto
+            };
+
+            if (id) {
+                const idx = cigars.findIndex(c => c.id === id);
+                if (idx !== -1) cigars[idx] = entryData;
+            } else {
+                cigars.unshift(entryData);
+            }
+
+            if (saveToStorage()) {
+                closeEntryModal();
+                renderApp();
+                showToast(id ? 'Cigar updated!' : 'Cigar logged!');
+            }
+        }
+
+        function deleteCigarEntry(id, event) {
+            if (event) event.stopPropagation();
+            cigars = cigars.filter(c => c.id !== id);
+            saveToStorage();
+            closeDetailModal();
+            renderApp();
+            showToast('Entry deleted');
+        }
+
+        // =========================================================================
+        // DETAIL MODAL
+        // =========================================================================
+        function openDetailModal(id) {
+            const cigar = cigars.find(c => c.id === id);
+            if (!cigar) return;
+
+            document.getElementById('detail-photo').src = cigar.photo;
+            document.getElementById('detail-name').textContent = cigar.name;
+            document.getElementById('detail-price').textContent = '$' + Number(cigar.price || 0).toFixed(2);
+            document.getElementById('detail-meta').textContent = `${cigar.size || 'Standard'}  •  Smoked ${cigar.date}`;
+
+            const badge = document.getElementById('detail-badge');
+            if (cigar.buyAgain) {
+                badge.textContent = 'Worth Buying Again';
+                badge.className = 'absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md bg-emerald-950/90 text-emerald-300 border border-emerald-500/40';
+            } else {
+                badge.textContent = 'Pass';
+                badge.className = 'absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md bg-red-950/90 text-red-300 border border-red-500/40';
+            }
+
+            const notesBox = document.getElementById('detail-notes-box');
+            if (cigar.notes) {
+                notesBox.classList.remove('hidden');
+                document.getElementById('detail-notes').textContent = cigar.notes;
+            } else {
+                notesBox.classList.add('hidden');
+            }
+
+            document.getElementById('detail-edit-btn').onclick = () => {
+                closeDetailModal();
+                openEntryModal(cigar.id);
+            };
+            document.getElementById('detail-delete-btn').onclick = () => {
+                deleteCigarEntry(cigar.id);
+            };
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        // =========================================================================
+        // SEARCH, FILTER & RENDERING
+        // =========================================================================
+        function handleSearch() {
+            const input = document.getElementById('search-input');
+            searchQuery = input.value.trim().toLowerCase();
+            const clearBtn = document.getElementById('clear-search-btn');
+            clearBtn.classList.toggle('hidden', searchQuery.length === 0);
+            renderApp();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            searchQuery = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            renderApp();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                btn.className = 'filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700';
+            });
+            const activeBtn = document.getElementById('filter-' + filter);
+            if (activeBtn) {
+                activeBtn.className = 'filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-gold-500 text-cedar-950';
+            }
+            renderApp();
+        }
+
+        function renderApp() {
+            const total = cigars.length;
+            const totalSpent = cigars.reduce((sum, c) => sum + (Number(c.price) || 0), 0);
+            const buyCount = cigars.filter(c => c.buyAgain).length;
+            const buyRate = total > 0 ? Math.round((buyCount / total) * 100) : 0;
+
+            document.getElementById('header-count-badge').textContent = total;
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-total-spent').textContent = '$' + totalSpent.toFixed(2);
+            document.getElementById('stat-buy-rate').textContent = buyRate + '%';
+
+            const hasSamples = cigars.some(c => c.isSample);
+            document.getElementById('sample-banner').classList.toggle('hidden', !hasSamples);
+
+            const filtered = cigars.filter(c => {
+                const matchesSearch = !searchQuery || c.name.toLowerCase().includes(searchQuery);
+                const matchesFilter = currentFilter === 'all' || 
+                    (currentFilter === 'yes' && c.buyAgain) || 
+                    (currentFilter === 'no' && !c.buyAgain);
+                return matchesSearch && matchesFilter;
+            });
+
+            const listEl = document.getElementById('cigar-list');
+            const emptyEl = document.getElementById('empty-state');
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '';
+                emptyEl.classList.remove('hidden');
+                if (cigars.length > 0) {
+                    document.getElementById('empty-title').textContent = 'No Matching Cigars';
+                    document.getElementById('empty-subtitle').textContent = 'Try clearing your search term or switching filters.';
+                    document.getElementById('load-samples-btn').classList.add('hidden');
+                } else {
+                    document.getElementById('empty-title').textContent = 'Your Humidor Log is Empty';
+                    document.getElementById('empty-subtitle').textContent = "Snap a photo of the cigar you're smoking, record the size & price, and mark whether you'd buy it again.";
+                    document.getElementById('load-samples-btn').classList.remove('hidden');
+                }
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+            listEl.innerHTML = filtered.map(cigar => `
+                <article onclick="openDetailModal('${cigar.id}')" class="cursor-pointer bg-cedar-900 hover:bg-cedar-850 active:scale-[0.99] transition rounded-2xl border border-cedar-800 p-3 shadow-md">
+                    <div class="flex gap-3.5 items-start">
+                        <img src="${cigar.photo}" alt="${escapeHtml(cigar.name)}" class="w-20 h-20 rounded-xl object-cover bg-cedar-950 border border-cedar-700 shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="font-serif font-bold text-base text-amber-50 truncate">${escapeHtml(cigar.name)}</h3>
+                                <span class="font-bold text-sm text-gold-400 shrink-0">$${Number(cigar.price || 0).toFixed(2)}</span>
+                            </div>
+                            <p class="text-xs text-stone-400 truncate mt-0.5">${escapeHtml(cigar.size || 'Standard')} • ${cigar.date}</p>
+                            ${cigar.notes ? `<p class="text-xs text-stone-300/90 line-clamp-1 mt-1">${escapeHtml(cigar.notes)}</p>` : ''}
+                            <div class="flex items-center justify-between gap-2 mt-2.5">
+                                ${cigar.buyAgain 
+                                    ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950/90 text-emerald-300 border border-emerald-600/40">Yes • Buy Again</span>`
+                                    : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-red-950/90 text-red-300 border border-red-600/40">Pass</span>`
+                                }
+                                <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+                                    <button type="button" onclick="openEntryModal('${cigar.id}')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] font-semibold text-amber-200 border border-cedar-700">
+                                        Edit
+                                    </button>
+                                    <button type="button" onclick="deleteCigarEntry('${cigar.id}', event)" class="px-2.5 py-1 rounded-lg bg-red-950/60 hover:bg-red-900/80 text-[11px] font-semibold text-red-300 border border-red-800/40">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // =========================================================================
+        // EXPORT & BACKUP FUNCTIONS (Excel .xlsx with Photos, HTML, CSV, JSON)
+        // =========================================================================
+        function openExportModal() {
+            const bytes = new Blob([localStorage.getItem(STORAGE_KEY) || '']).size;
+            const kb = (bytes / 1024).toFixed(1);
+            document.getElementById('storage-usage').textContent = `${kb} KB`;
+            updateExportDestinationUI();
+            document.getElementById('export-modal').classList.remove('hidden');
+        }
+
+        function closeExportModal() {
+            document.getElementById('export-modal').classList.add('hidden');
+        }
+
+        function updateExportDestinationUI() {
+            const labelEl = document.getElementById('export-folder-label');
+            const badgeEl = document.getElementById('export-mode-badge');
+            const chooseBtnText = document.getElementById('choose-folder-btn-text');
+            const askBtn = document.getElementById('toggle-save-as-btn');
+            const resetRow = document.getElementById('folder-reset-row');
+
+            if (selectedDirectoryHandle && exportSaveMode === 'directory') {
+                labelEl.textContent = `Folder: ${selectedDirectoryHandle.name}`;
+                badgeEl.textContent = 'Custom Folder';
+                badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-600/40 shrink-0';
+                chooseBtnText.textContent = 'Change Folder';
+                askBtn.className = 'py-2 px-2.5 rounded-xl bg-cedar-800 hover:bg-cedar-700 text-stone-200 border border-cedar-700 text-xs font-semibold transition';
+                resetRow.classList.remove('hidden');
+            } else if (exportSaveMode === 'ask') {
+                labelEl.textContent = 'Ask Where to Save / Share Each Time';
+                badgeEl.textContent = 'Save As / Share';
+                badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-950 text-gold-400 border border-gold-500/40 shrink-0';
+                chooseBtnText.textContent = '+ Choose Folder';
+                askBtn.className = 'py-2 px-2.5 rounded-xl bg-gold-500 text-cedar-950 border border-gold-400 text-xs font-bold transition';
+                resetRow.classList.add('hidden');
+            } else {
+                labelEl.textContent = 'Default Downloads Folder';
+                badgeEl.textContent = 'Standard';
+                badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cedar-800 text-stone-300 border border-cedar-700 shrink-0';
+                chooseBtnText.textContent = '+ Choose Folder';
+                askBtn.className = 'py-2 px-2.5 rounded-xl bg-cedar-800 hover:bg-cedar-700 text-stone-200 border border-cedar-700 text-xs font-semibold transition';
+                resetRow.classList.add('hidden');
+            }
+        }
+
+        async function chooseExportFolder() {
+            if ('showDirectoryPicker' in window) {
+                try {
+                    const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    selectedDirectoryHandle = handle;
+                    exportSaveMode = 'directory';
+                    updateExportDestinationUI();
+                    showToast(`Export folder set to "${handle.name}"`);
+                    return;
+                } catch (err) {
+                    if (err && err.name === 'AbortError') return;
+                    console.warn('Directory picker unavailable in this context:', err);
+                }
+            }
+
+            exportSaveMode = 'ask';
+            selectedDirectoryHandle = null;
+            updateExportDestinationUI();
+            showToast('Direct folder lock restricted — switched to Ask / Share mode!');
+        }
+
+        function toggleSaveMode() {
+            if (exportSaveMode === 'ask') {
+                exportSaveMode = selectedDirectoryHandle ? 'directory' : 'default';
+            } else {
+                exportSaveMode = 'ask';
+            }
+            updateExportDestinationUI();
+        }
+
+        function resetExportFolder() {
+            selectedDirectoryHandle = null;
+            exportSaveMode = 'default';
+            updateExportDestinationUI();
+            showToast('Reset to Default Downloads Folder');
+        }
+
+        // Convert JPEG, PNG, or SVG sample art into base64 JPEG/PNG for ExcelJS
+        async function normalizeImageForExcel(dataUrl) {
+            if (!dataUrl || typeof dataUrl !== 'string') return null;
+
+            const directMatch = dataUrl.match(/^data:image\/(jpeg|jpg|png);base64,(.+)$/i);
+            if (directMatch) {
+                const ext = directMatch[1].toLowerCase() === 'jpg' ? 'jpeg' : directMatch[1].toLowerCase();
+                return { base64: directMatch[2], extension: ext };
+            }
+
+            if (dataUrl.startsWith('data:image/svg+xml')) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = 360;
+                            canvas.height = 240;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            const pngDataUrl = canvas.toDataURL('image/png');
+                            const base64 = pngDataUrl.split(',')[1];
+                            resolve(base64 ? { base64, extension: 'png' } : null);
+                        } catch (e) {
+                            resolve(null);
+                        }
+                    };
+                    img.onerror = () => resolve(null);
+                    img.src = dataUrl;
+                });
+            }
+
+            return null;
+        }
+
+        async function exportToExcel() {
+            if (cigars.length === 0) {
+                showToast('No cigars to export yet!');
+                return;
+            }
+            if (typeof ExcelJS === 'undefined') {
+                showToast('Excel engine loading — exporting CSV fallback...');
+                await exportToCSV();
+                return;
+            }
+
+            const exportBtn = document.getElementById('btn-export-xlsx');
+            const exportTitle = document.getElementById('btn-export-xlsx-title');
+            const originalTitle = exportTitle ? exportTitle.textContent : 'Export Excel with Photos (.xlsx)';
+
+            if (exportBtn) exportBtn.disabled = true;
+            if (exportTitle) exportTitle.textContent = 'Embedding photos into Excel...';
+
+            try {
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = 'Cigar Ledger';
+                workbook.created = new Date();
+
+                const worksheet = workbook.addWorksheet('Cigar Log', {
+                    views: [{ state: 'frozen', ySplit: 1 }]
+                });
+
+                worksheet.columns = [
+                    { header: 'Photo', key: 'photo', width: 22 },
+                    { header: 'Date', key: 'date', width: 14 },
+                    { header: 'Cigar Name', key: 'name', width: 32 },
+                    { header: 'Size / Vitola', key: 'size', width: 22 },
+                    { header: 'Price Paid', key: 'price', width: 15 },
+                    { header: 'Worth Buying Again', key: 'buyAgain', width: 20 },
+                    { header: 'Tasting Notes', key: 'notes', width: 42 }
+                ];
+
+                // Deep Cedar header row with Gold text
+                const headerRow = worksheet.getRow(1);
+                headerRow.height = 30;
+                headerRow.eachCell((cell) => {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FF2B1D15' }
+                    };
+                    cell.font = {
+                        name: 'Calibri',
+                        size: 11,
+                        bold: true,
+                        color: { argb: 'FFF3C669' }
+                    };
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FF573B2C' } },
+                        bottom: { style: 'medium', color: { argb: 'FFD99B26' } },
+                        left: { style: 'thin', color: { argb: 'FF573B2C' } },
+                        right: { style: 'thin', color: { argb: 'FF573B2C' } }
+                    };
+                });
+
+                for (let i = 0; i < cigars.length; i++) {
+                    const c = cigars[i];
+                    const rowIndex = i + 2;
+                    const normalizedImg = await normalizeImageForExcel(c.photo);
+
+                    const row = worksheet.addRow({
+                        photo: normalizedImg ? '' : 'No photo',
+                        date: c.date || '',
+                        name: c.name || '',
+                        size: c.size || 'Standard',
+                        price: Number(c.price || 0),
+                        buyAgain: c.buyAgain ? 'Yes' : 'No',
+                        notes: c.notes || ''
+                    });
+
+                    // Expanded row height (102 pt) so embedded photo fits comfortably
+                    row.height = normalizedImg ? 102 : 28;
+
+                    const isEvenRow = i % 2 === 1;
+                    row.eachCell((cell, colNumber) => {
+                        cell.font = {
+                            name: 'Calibri',
+                            size: 11,
+                            color: { argb: 'FF1F2937' },
+                            bold: colNumber === 3 || colNumber === 5
+                        };
+
+                        if (isEvenRow) {
+                            cell.fill = {
+                                type: 'pattern',
+                                pattern: 'solid',
+                                fgColor: { argb: 'FFFAF7F4' }
+                            };
+                        }
+
+                        cell.border = {
+                            top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                            bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                            left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+                            right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
+                        };
+
+                        if (colNumber === 1 || colNumber === 2 || colNumber === 6) {
+                            cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                        } else if (colNumber === 5) {
+                            cell.numFmt = '$#,##0.00';
+                            cell.alignment = { vertical: 'middle', horizontal: 'right' };
+                        } else {
+                            cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+                        }
+
+                        if (colNumber === 6) {
+                            cell.font = {
+                                name: 'Calibri',
+                                size: 11,
+                                bold: true,
+                                color: { argb: c.buyAgain ? 'FF166534' : 'FF991B1B' }
+                            };
+                        }
+                    });
+
+                    if (normalizedImg) {
+                        const imageId = workbook.addImage({
+                            base64: normalizedImg.base64,
+                            extension: normalizedImg.extension
+                        });
+
+                        worksheet.addImage(imageId, {
+                            tl: { col: 0.12, row: rowIndex - 1 + 0.08 },
+                            ext: { width: 132, height: 118 },
+                            editAs: 'oneCell'
+                        });
+                    }
+                }
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                const filename = `Cigar-Ledger-Photos-${new Date().toISOString().split('T')[0]}.xlsx`;
+                const blob = new Blob([buffer], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                });
+
+                await saveExportBlob(blob, filename, 'Excel with Photos (.xlsx)', '.xlsx');
+            } catch (err) {
+                console.error('Excel export failed:', err);
+                showToast('Error building Excel file. Try HTML or CSV export.');
+            } finally {
+                if (exportBtn) exportBtn.disabled = false;
+                if (exportTitle) exportTitle.textContent = originalTitle;
+            }
+        }
+
+        async function exportToCSV() {
+            if (cigars.length === 0) {
+                showToast('No cigars to export yet!');
+                return;
+            }
+            const headers = ['Date', 'Cigar Name', 'Size / Vitola', 'Price Paid', 'Worth Buying Again', 'Tasting Notes'];
+            const csvRows = [headers.join(',')];
+
+            cigars.forEach(c => {
+                const row = [
+                    `"${c.date}"`,
+                    `"${(c.name || '').replace(/"/g, '""')}"`,
+                    `"${(c.size || '').replace(/"/g, '""')}"`,
+                    Number(c.price || 0).toFixed(2),
+                    `"${c.buyAgain ? 'Yes' : 'No'}"`,
+                    `"${(c.notes || '').replace(/"/g, '""')}"`
+                ];
+                csvRows.push(row.join(','));
+            });
+
+            const filename = `Cigar-Ledger-${new Date().toISOString().split('T')[0]}.csv`;
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            await saveExportBlob(blob, filename, 'CSV spreadsheet', '.csv');
+        }
+
+        async function exportVisualHTML() {
+            if (cigars.length === 0) {
+                showToast('No cigars to export yet!');
+                return;
+            }
+            const rowsHtml = cigars.map(c => `
+                <tr>
+                    <td style="padding:12px;border-bottom:1px solid #e5e7eb;width:130px;">
+                        <img src="${c.photo}" style="width:110px;height:82px;object-fit:cover;border-radius:8px;display:block;">
+                    </td>
+                    <td style="padding:12px;border-bottom:1px solid #e5e7eb;font-weight:bold;font-size:15px;">${escapeHtml(c.name)}</td>
+                    <td style="padding:12px;border-bottom:1px solid #e5e7eb;">${escapeHtml(c.size || '')}</td>
+                    <td style="padding:12px;border-bottom:1px solid #e5e7eb;font-weight:bold;">$${Number(c.price || 0).toFixed(2)}</td>
+                    <td style="padding:12px;border-bottom:1px solid #e5e7eb;">
+                        <span style="padding:4px 10px;border-radius:999px;font-size:12px;font-weight:bold;background:${c.buyAgain ? '#dcfce7' : '#fee2e2'};color:${c.buyAgain ? '#166534' : '#991b1b'};">
+                            ${c.buyAgain ? 'Yes - Buy Again' : 'No - Pass'}
+                        </span>
+                    </td>
+                    <td style="padding:12px;border-bottom:1px solid #e5e7eb;color:#4b5563;font-size:13px;">${c.date}<br><small>${escapeHtml(c.notes || '')}</small></td>
+                </tr>
+            `).join('');
+
+            const docHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cigar Ledger Photo Report</title>
+<style>
+    body { font-family: Arial, sans-serif; color: #1f2937; max-width: 960px; margin: 30px auto; padding: 0 20px; }
+    h1 { color: #3d291e; border-bottom: 2px solid #d99b26; padding-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { background: #2b1d15; color: #fef3c7; text-align: left; padding: 12px; font-size: 13px; }
+</style>
+</head>
+<body>
+    <h1>Cigar Ledger — Visual Humidor Report</h1>
+    <p>Generated on ${new Date().toLocaleDateString()} • Total Cigars: ${cigars.length}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Photo</th>
+                <th>Cigar Name</th>
+                <th>Size / Vitola</th>
+                <th>Price Paid</th>
+                <th>Buy Again?</th>
+                <th>Date & Tasting Notes</th>
+            </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+    </table>
+</body>
+</html>`;
+
+            const filename = `Cigar-Photo-Report-${new Date().toISOString().split('T')[0]}.html`;
+            const blob = new Blob([docHtml], { type: 'text/html;charset=utf-8;' });
+            await saveExportBlob(blob, filename, 'Photo + Text Report', '.html');
+        }
+
+        async function exportBackupJSON() {
+            const filename = `Cigar-Ledger-Backup-${new Date().toISOString().split('T')[0]}.json`;
+            const blob = new Blob([JSON.stringify(cigars, null, 2)], { type: 'application/json' });
+            await saveExportBlob(blob, filename, 'Full Backup (.json)', '.json');
+        }
+
+        function importBackupJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        cigars = imported;
+                        saveToStorage();
+                        renderApp();
+                        closeExportModal();
+                        showToast(`Restored ${cigars.length} cigars!`);
+                    }
+                } catch (err) {
+                    showToast('Invalid backup file');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function saveExportBlob(blob, filename, label, extension) {
+            // 1. Write directly to the user's chosen directory handle if selected
+            if (selectedDirectoryHandle && exportSaveMode === 'directory') {
+                try {
+                    const fileHandle = await selectedDirectoryHandle.getFileHandle(filename, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    showToast(`Saved ${label} to "${selectedDirectoryHandle.name}"!`);
+                    return;
+                } catch (err) {
+                    console.warn('Could not write to saved directory handle, falling back:', err);
+                    showToast('Folder permission expired — pick a location to save');
+                }
+            }
+
+            // 2. If user chose "Ask Location Each Time", try Save File Picker or Android Native Share
+            if (exportSaveMode === 'ask') {
+                if ('showSaveFilePicker' in window) {
+                    try {
+                        const fileHandle = await window.showSaveFilePicker({
+                            suggestedName: filename,
+                            types: [{
+                                description: label,
+                                accept: { [blob.type || 'application/octet-stream']: [extension] }
+                            }]
+                        });
+                        const writable = await fileHandle.createWritable();
+                        await writable.write(blob);
+                        await writable.close();
+                        showToast(`Saved ${label} to chosen location!`);
+                        return;
+                    } catch (err) {
+                        if (err && err.name === 'AbortError') return;
+                    }
+                }
+
+                // Android Native Share Sheet fallback
+                try {
+                    const file = new File([blob], filename, { type: blob.type || 'application/octet-stream' });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: filename
+                        });
+                        showToast(`Shared ${label}!`);
+                        return;
+                    }
+                } catch (err) {
+                    if (err && err.name === 'AbortError') return;
+                }
+            }
+
+            // 3. Default standard download to device Downloads folder
+            triggerDownloadBlob(blob, filename);
+            showToast(`${label} saved to Downloads!`);
+        }
+
+        function triggerDownloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 2600);
+        }
+    </script>
+</body>
+</html>
