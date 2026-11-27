@@ -14,7 +14,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- ExcelJS for true Excel (.xlsx) Export with Embedded Images -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js" defer></script>
     
     <!-- Google Fonts: Inter & Playfair Display -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,34 +22,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                    },
-                    colors: {
-                        cedar: {
-                            950: '#0f0a07',
-                            900: '#18100c',
-                            850: '#211610',
-                            800: '#2b1d15',
-                            700: '#3d291e',
-                            600: '#573b2c',
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Inter', 'sans-serif'],
+                            serif: ['Playfair Display', 'serif'],
                         },
-                        gold: {
-                            400: '#f3c669',
-                            500: '#d99b26',
-                            600: '#b87d14',
+                        colors: {
+                            cedar: {
+                                950: '#140e0a',
+                                900: '#1f1610',
+                                850: '#261b14',
+                                800: '#2f2118',
+                                700: '#422e21',
+                                600: '#5c402e',
+                            },
+                            gold: {
+                                400: '#e6b86a',
+                                500: '#d4a259',
+                                600: '#b8863b',
+                            }
                         }
                     }
                 }
-            }
+            };
         }
     </script>
     <style>
+        body {
+            background-color: #140e0a;
+            color: #f5f5f4;
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -78,7 +84,7 @@
                 </div>
             </div>
 
-            <button onclick="openExportModal()" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-gold-500/20 to-amber-600/20 hover:from-gold-500/30 hover:to-amber-600/30 active:scale-95 transition text-gold-400 text-xs font-bold border border-gold-500/40 shadow-sm shrink-0">
+            <button type="button" onclick="window.openExportModal()" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-gold-500/20 to-amber-600/20 hover:from-gold-500/30 hover:to-amber-600/30 active:scale-95 transition text-gold-400 text-xs font-bold border border-gold-500/40 shadow-sm shrink-0">
                 <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                 </svg>
@@ -91,14 +97,14 @@
             <div class="grid grid-cols-3 gap-2">
                 <div class="bg-cedar-850/90 border border-cedar-800 rounded-xl px-3 py-2 text-center">
                     <div id="stat-total" class="text-base font-bold text-amber-50">0</div>
-                    <div class="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Logged</div>
+                    <div class="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Total Smoked</div>
                 </div>
                 <div class="bg-cedar-850/90 border border-cedar-800 rounded-xl px-3 py-2 text-center">
-                    <div id="stat-total-spent" class="text-base font-bold text-gold-400">$0.00</div>
-                    <div class="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Total Spent</div>
+                    <div id="stat-avg-price" class="text-base font-bold text-gold-400">$0.00</div>
+                    <div class="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Avg Price</div>
                 </div>
                 <div class="bg-cedar-850/90 border border-cedar-800 rounded-xl px-3 py-2 text-center">
-                    <div id="stat-buy-rate" class="text-base font-bold text-emerald-400">0</div>
+                    <div id="stat-try-again" class="text-base font-bold text-emerald-400">0</div>
                     <div class="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Try Again</div>
                 </div>
             </div>
@@ -114,10 +120,10 @@
                     type="text" 
                     id="search-input" 
                     placeholder="Search cigars by name..." 
-                    oninput="handleSearch()"
+                    oninput="window.handleSearch()"
                     class="w-full pl-10 pr-9 py-2.5 rounded-xl bg-cedar-950 border border-cedar-700 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition"
                 >
-                <button id="clear-search-btn" onclick="clearSearch()" aria-label="Clear search" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200 p-1">
+                <button type="button" id="clear-search-btn" onclick="window.clearSearch()" aria-label="Clear search" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200 p-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -126,16 +132,16 @@
 
             <!-- Filter Pills -->
             <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                <button onclick="setFilter('all')" id="filter-all" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-gold-500 text-cedar-950">
+                <button type="button" onclick="window.setFilter('all')" id="filter-all" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-gold-500 text-cedar-950">
                     All
                 </button>
-                <button onclick="setFilter('Need More')" id="filter-Need More" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
+                <button type="button" onclick="window.setFilter('Need More')" id="filter-Need More" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
                     Need More
                 </button>
-                <button onclick="setFilter('Try Again')" id="filter-Try Again" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
+                <button type="button" onclick="window.setFilter('Try Again')" id="filter-Try Again" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
                     Try Again
                 </button>
-                <button onclick="setFilter('Forget It')" id="filter-Forget It" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
+                <button type="button" onclick="window.setFilter('Forget It')" id="filter-Forget It" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
                     Forget It
                 </button>
             </div>
@@ -149,7 +155,7 @@
             <div class="text-xs text-amber-200/90">
                 <span class="font-semibold text-gold-400">Sample entries loaded</span> so you can preview search & Excel export.
             </div>
-            <button onclick="clearSampleData()" class="px-3 py-1.5 rounded-xl bg-cedar-800 hover:bg-cedar-700 text-xs font-semibold text-amber-200 whitespace-nowrap border border-cedar-700">
+            <button type="button" onclick="window.clearSampleData()" class="px-3 py-1.5 rounded-xl bg-cedar-800 hover:bg-cedar-700 text-xs font-semibold text-amber-200 whitespace-nowrap border border-cedar-700">
                 Clear Samples
             </button>
         </div>
@@ -163,6 +169,114 @@
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+            <h2 id="empty-title" class="font-serif text-xl font-bold text-amber-50 mb-1.5">Your Humidor Log is Empty</h2>
+            <p id="empty-subtitle" class="text-sm text-stone-400 max-w-xs mx-auto mb-6">
+                Snap a photo of the cigar you're smoking, record the size & price, and rate it.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button type="button" id="empty-log-first-btn" onclick="window.openEntryModal()" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gold-500 hover:bg-gold-400 text-cedar-950 font-bold text-sm shadow-lg shadow-amber-950/50 transition">
+                    + Log Your First Cigar
+                </button>
+                <button type="button" id="load-samples-btn" onclick="window.loadSampleData(true)" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-cedar-800 hover:bg-cedar-700 text-stone-200 font-semibold text-sm border border-cedar-700 transition">
+                    Load 2 Sample Cigars
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Action Button (FAB) -->
+    <div class="fixed bottom-6 right-5 z-40">
+        <button type="button" id="fab-log-cigar-btn" onclick="window.openEntryModal()" aria-label="Log New Cigar" class="flex items-center gap-2 pl-4 pr-5 py-3.5 rounded-full bg-gradient-to-r from-gold-500 to-amber-500 hover:from-gold-400 hover:to-amber-400 active:scale-95 text-cedar-950 font-bold text-sm shadow-xl shadow-black/80 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span>+ Log Cigar</span>
+        </button>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 1: ADD / EDIT CIGAR ENTRY                                       -->
+    <!-- ===================================================================== -->
+    <div id="entry-modal" style="display: none; z-index: 9999;" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-cedar-900 border-t sm:border border-cedar-700 w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-5 py-4 border-b border-cedar-800 flex items-center justify-between bg-cedar-900 shrink-0">
+                <h2 id="entry-modal-title" class="font-serif text-lg font-bold text-amber-50">Log a Cigar</h2>
+                <button type="button" onclick="window.closeEntryModal()" aria-label="Close modal" class="p-2 rounded-xl bg-cedar-800 text-stone-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Form Body -->
+            <form id="cigar-form" onsubmit="window.saveCigarEntry(event)" class="p-5 overflow-y-auto space-y-4">
+                <input type="hidden" id="entry-id">
+
+                <!-- Photo Capture / Preview Box -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Cigar Photo</label>
+                    <div class="relative">
+                        <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="window.handlePhotoUpload(event)" class="hidden">
+                        
+                        <!-- Empty Camera Trigger -->
+                        <div id="photo-placeholder" onclick="document.getElementById('photo-input').click()" class="cursor-pointer rounded-2xl border-2 border-dashed border-cedar-600 hover:border-gold-500 bg-cedar-950/70 p-5 text-center transition">
+                            <div class="w-12 h-12 rounded-full bg-cedar-800 text-gold-400 mx-auto flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </div>
+                            <p class="text-sm font-semibold text-amber-100">Tap to Take Photo or Choose Image</p>
+                            <p class="text-xs text-stone-400 mt-0.5">Automatically compressed for storage & Excel export</p>
+                        </div>
+
+                        <!-- Active Image Preview -->
+                        <div id="photo-preview-container" class="hidden relative rounded-2xl overflow-hidden border border-cedar-700 bg-cedar-950">
+                            <img id="photo-preview" src="" alt="Cigar preview" class="w-full h-48 object-cover">
+                            <div class="absolute bottom-2.5 right-2.5 flex gap-2">
+                                <button type="button" onclick="document.getElementById('photo-input').click()" class="px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-md text-xs font-semibold text-white border border-white/15">
+                                    Retake
+                                </button>
+                                <button type="button" onclick="window.removePhoto()" class="px-3 py-1.5 rounded-xl bg-red-950/85 backdrop-blur-md text-xs font-semibold text-red-200 border border-red-500/30">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cigar Name -->
+                <div>
+                    <label for="cigar-name" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Cigar Name *</label>
+                    <input type="text" id="cigar-name" required placeholder="e.g., Padron 1964 Anniversary" class="w-full px-4 py-3 rounded-xl bg-cedar-950 border border-cedar-700 text-sm text-white placeholder-stone-500 focus:outline-none focus:border-gold-500">
+                </div>
+
+                <!-- Size / Vitola + Quick Presets -->
+                <div>
+                    <label for="cigar-size" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Size / Vitola</label>
+                    <input type="text" id="cigar-size" placeholder="e.g., Robusto (5x50)" class="w-full px-4 py-3 rounded-xl bg-cedar-950 border border-cedar-700 text-sm text-white placeholder-stone-500 focus:outline-none focus:border-gold-500">
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                        <button type="button" onclick="window.setSizePreset('Robusto (5x50)')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] text-stone-300 border border-cedar-700">Robusto</button>
+                        <button type="button" onclick="window.setSizePreset('Toro (6x52)')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] text-stone-300 border border-cedar-700">Toro</button>
+                        <button type="button" onclick="window.setSizePreset('Corona (5.5x42)')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] text-stone-300 border border-cedar-700">Corona</button>
+                        <button type="button" onclick="window.setSizePreset('Churchill (7x48)')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] text-stone-300 border border-cedar-700">Churchill</button>
+                        <button type="button" onclick="window.setSizePreset('Torpedo (6.1x52)')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] text-stone-300 border border-cedar-700">Torpedo</button>
+                        <button type="button" onclick="window.setSizePreset('Gordo (6x60)')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] text-stone-300 border border-cedar-700">Gordo</button>
+                    </div>
+                </div>
+
+                <!-- Price Paid & Date Row -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="cigar-price" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Price Paid ($)</label>
+                        <input type="number" id="cigar-price" step="0.01" min="0" inputmode="decimal" placeholder="0.00" class="w-full px-4 py-3 rounded-xl bg-cedar-950 border border-cedar-700 text-sm text-white placeholder-stone-500 focus:outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label for="cigar-date" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Date Smoked</label>
+                        <input type="date" id="cigar-date" class="w-full   <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
             </div>
             <h2 id="empty-title" class="font-serif text-xl font-bold text-amber-50 mb-1.5">Your Humidor Log is Empty</h2>
