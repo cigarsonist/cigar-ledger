@@ -260,6 +260,19 @@
                         <button type="button" onclick="setSizePreset('Torpedo (6.1x52)')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] text-stone-300 border border-cedar-700">Torpedo (6.1x52)</button>
                     </div>
                 </div>
+
+                <!-- Price Paid & Date Row -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="cigar-price" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Price Paid ($)</label>
+                        <input type="number" id="cigar-price" step="0.01" min="0" inputmode="decimal" placeholder="0.00" class="w-full px-4 py-3 rounded-xl bg-cedar-950 border border-cedar-700 text-sm text-white placeholder-stone-500 focus:outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label for="cigar-date" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Date Smoked</label>
+                        <input type="date" id="cigar-date" class="w-full px-3 py-3 rounded-xl bg-cedar-950 border border-cedar-700 text-sm text-white focus:outline-none focus:border-gold-500">
+                    </div>
+                </div>
+
                 <!-- Rating / Verdict Toggle (Left to Right: Need More, Try Again, Forget It) -->
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Rating</label>
@@ -659,26 +672,66 @@
         // =========================================================================
         // ADD / EDIT / DELETE CIGAR LOGIC
         // =========================================================================
+        function showModal(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.remove('hidden');
+            el.style.display = 'flex';
+        }
+
+        function hideModal(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.add('hidden');
+            el.style.display = 'none';
+        }
+
         function openEntryModal(editId = null) {
             const form = document.getElementById('cigar-form');
-            form.reset();
+            if (form) form.reset();
             removePhoto();
+
+            const titleEl = document.getElementById('entry-modal-title');
+            const idEl = document.getElementById('entry-id');
+            const nameEl = document.getElementById('cigar-name');
+            const sizeEl = document.getElementById('cigar-size');
+            const priceEl = document.getElementById('cigar-price');
+            const dateEl = document.getElementById('cigar-date');
+            const notesEl = document.getElementById('cigar-notes');
 
             if (editId) {
                 const entry = cigars.find(c => c.id === editId);
                 if (!entry) return;
-                document.getElementById('entry-modal-title').textContent = 'Edit Cigar Entry';
-                document.getElementById('entry-id').value = entry.id;
-                document.getElementById('cigar-name').value = entry.name;
-                document.getElementById('cigar-size').value = entry.size || '';
-                document.getElementById('cigar-price').value = entry.price !== null ? entry.price : '';
-                document.getElementById('cigar-date').value = entry.date || new Date().toISOString().split('T')[0];
-                document.getElementById('cigar-notes').value = entry.notes || '';
+                if (titleEl) titleEl.textContent = 'Edit Cigar Entry';
+                if (idEl) idEl.value = entry.id;
+                if (nameEl) nameEl.value = entry.name || '';
+                if (sizeEl) sizeEl.value = entry.size || '';
+                if (priceEl) priceEl.value = (entry.price !== null && entry.price !== undefined) ? entry.price : '';
+                if (dateEl) dateEl.value = entry.date || new Date().toISOString().split('T')[0];
+                if (notesEl) notesEl.value = entry.notes || '';
                 setRating(normalizeRating(entry));
                 if (entry.photo) {
                     currentPhotoDataUrl = entry.photo;
                     showPhotoPreview(entry.photo);
                 }
+            } else {
+                if (titleEl) titleEl.textContent = 'Log a Cigar';
+                if (idEl) idEl.value = '';
+                if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+                setRating('Need More');
+            }
+
+            showModal('entry-modal');
+        }
+
+        function closeEntryModal() {
+            hideModal('entry-modal');
+        }
+
+        function setSizePreset(preset) {
+            const sizeEl = document.getElementById('cigar-size');
+            if (sizeEl) sizeEl.value = preset;
+        }
             } else {
                 document.getElementById('entry-modal-title').textContent = 'Log a Cigar';
                 document.getElementById('entry-id').value = '';
@@ -720,13 +773,20 @@
 
         function saveCigarEntry(event) {
             event.preventDefault();
-            const id = document.getElementById('entry-id').value;
-            const name = document.getElementById('cigar-name').value.trim();
-            const size = document.getElementById('cigar-size').value.trim();
-            const priceRaw = document.getElementById('cigar-price').value;
+            const idEl = document.getElementById('entry-id');
+            const nameEl = document.getElementById('cigar-name');
+            const sizeEl = document.getElementById('cigar-size');
+            const priceEl = document.getElementById('cigar-price');
+            const dateEl = document.getElementById('cigar-date');
+            const notesEl = document.getElementById('cigar-notes');
+
+            const id = idEl ? idEl.value : '';
+            const name = nameEl ? nameEl.value.trim() : '';
+            const size = sizeEl ? sizeEl.value.trim() : '';
+            const priceRaw = priceEl ? priceEl.value : '';
             const price = priceRaw !== '' ? parseFloat(priceRaw) : 0;
-            const date = document.getElementById('cigar-date').value || new Date().toISOString().split('T')[0];
-            const notes = document.getElementById('cigar-notes').value.trim();
+            const date = (dateEl && dateEl.value) ? dateEl.value : new Date().toISOString().split('T')[0];
+            const notes = notesEl ? notesEl.value.trim() : '';
 
             if (!name) return;
 
@@ -749,6 +809,202 @@
             } else {
                 cigars.unshift(entryData);
             }
+
+            if (saveToStorage()) {
+                closeEntryModal();
+                renderApp();
+                showToast(id ? 'Cigar updated!' : 'Cigar logged!');
+            }
+        }
+
+        function deleteCigarEntry(id, event) {
+            if (event) event.stopPropagation();
+            cigars = cigars.filter(c => c.id !== id);
+            saveToStorage();
+            closeDetailModal();
+            renderApp();
+            showToast('Entry deleted');
+        }
+
+        // =========================================================================
+        // DETAIL MODAL
+        // =========================================================================
+        function openDetailModal(id) {
+            const cigar = cigars.find(c => c.id === id);
+            if (!cigar) return;
+            const rating = normalizeRating(cigar);
+
+            document.getElementById('detail-photo').src = cigar.photo;
+            document.getElementById('detail-name').textContent = cigar.name;
+            document.getElementById('detail-price').textContent = '$' + Number(cigar.price || 0).toFixed(2);
+            document.getElementById('detail-meta').textContent = `${cigar.size || 'Standard'}  •  Smoked ${cigar.date}`;
+
+            const badge = document.getElementById('detail-badge');
+            badge.textContent = rating;
+            if (rating === 'Try Again') {
+                badge.className = 'absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md bg-emerald-950/90 text-emerald-300 border border-emerald-500/40';
+            } else if (rating === 'Forget It') {
+                badge.className = 'absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md bg-rose-950/90 text-rose-300 border border-rose-500/40';
+            } else {
+                badge.className = 'absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md bg-amber-950/90 text-gold-400 border border-gold-500/40';
+            }
+
+            const notesBox = document.getElementById('detail-notes-box');
+            const notesText = document.getElementById('detail-notes');
+            if (cigar.notes) {
+                notesBox.classList.remove('hidden');
+                notesText.textContent = cigar.notes;
+            } else {
+                notesBox.classList.add('hidden');
+            }
+
+            document.getElementById('detail-edit-btn').onclick = () => {
+                closeDetailModal();
+                openEntryModal(cigar.id);
+            };
+            document.getElementById('detail-delete-btn').onclick = () => {
+                deleteCigarEntry(cigar.id);
+            };
+
+            showModal('detail-modal');
+        }
+
+        function closeDetailModal() {
+            hideModal('detail-modal');
+        }
+
+        // =========================================================================
+        // SEARCH, FILTER & RENDERING
+        // =========================================================================
+        function handleSearch() {
+            const input = document.getElementById('search-input');
+            searchQuery = input.value.trim().toLowerCase();
+            const clearBtn = document.getElementById('clear-search-btn');
+            clearBtn.classList.toggle('hidden', searchQuery.length === 0);
+            renderApp();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            searchQuery = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            renderApp();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                btn.className = 'filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700';
+            });
+            const activeBtn = document.getElementById('filter-' + filter);
+            if (activeBtn) {
+                activeBtn.className = 'filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-gold-500 text-cedar-950';
+            }
+            renderApp();
+        }
+
+        function getRatingBadgeHtml(rating) {
+            if (rating === 'Try Again') {
+                return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950/90 text-emerald-300 border border-emerald-600/40">Try Again</span>`;
+            }
+            if (rating === 'Forget It') {
+                return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-950/90 text-rose-300 border border-rose-600/40">Forget It</span>`;
+            }
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-950/90 text-gold-400 border border-gold-500/40">Need More</span>`;
+        }
+
+        function renderApp() {
+            const total = cigars.length;
+            const totalSpent = cigars.reduce((sum, c) => sum + (Number(c.price) || 0), 0);
+            const tryAgainCount = cigars.filter(c => normalizeRating(c) === 'Try Again').length;
+
+            document.getElementById('header-count-badge').textContent = total;
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-total-spent').textContent = '$' + totalSpent.toFixed(2);
+            document.getElementById('stat-buy-rate').textContent = tryAgainCount;
+
+            const hasSamples = cigars.some(c => c.isSample);
+            document.getElementById('sample-banner').classList.toggle('hidden', !hasSamples);
+
+            const filtered = cigars.filter(c => {
+                const rating = normalizeRating(c);
+                const matchesSearch = !searchQuery || c.name.toLowerCase().includes(searchQuery);
+                const matchesFilter = currentFilter === 'all' || rating === currentFilter;
+                return matchesSearch && matchesFilter;
+            });
+
+            const listEl = document.getElementById('cigar-list');
+            const emptyEl = document.getElementById('empty-state');
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '';
+                emptyEl.classList.remove('hidden');
+                if (cigars.length > 0) {
+                    document.getElementById('empty-title').textContent = 'No Matching Cigars';
+                    document.getElementById('empty-subtitle').textContent = 'Try clearing your search term or switching filters.';
+                    document.getElementById('load-samples-btn').classList.add('hidden');
+                } else {
+                    document.getElementById('empty-title').textContent = 'Your Humidor Log is Empty';
+                    document.getElementById('empty-subtitle').textContent = "Snap a photo of the cigar you're smoking, record the size & price, and rate it.";
+                    document.getElementById('load-samples-btn').classList.remove('hidden');
+                }
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+            listEl.innerHTML = filtered.map(cigar => {
+                const rating = normalizeRating(cigar);
+                return `
+                <article onclick="openDetailModal('${cigar.id}')" class="cursor-pointer bg-cedar-900 hover:bg-cedar-850 active:scale-[0.99] transition rounded-2xl border border-cedar-800 p-3 shadow-md">
+                    <div class="flex gap-3.5 items-start">
+                        <img src="${cigar.photo}" alt="${escapeHtml(cigar.name)}" class="w-20 h-20 rounded-xl object-cover bg-cedar-950 border border-cedar-700 shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="font-serif font-bold text-base text-amber-50 truncate">${escapeHtml(cigar.name)}</h3>
+                                <span class="font-bold text-sm text-gold-400 shrink-0">$${Number(cigar.price || 0).toFixed(2)}</span>
+                            </div>
+                            <p class="text-xs text-stone-400 truncate mt-0.5">${escapeHtml(cigar.size || 'Standard')} • ${cigar.date}</p>
+                            ${cigar.notes ? `<p class="text-xs text-stone-300/90 line-clamp-1 mt-1">${escapeHtml(cigar.notes)}</p>` : ''}
+                            <div class="flex items-center justify-between gap-2 mt-2.5">
+                                ${getRatingBadgeHtml(rating)}
+                                <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+                                    <button type="button" onclick="openEntryModal('${cigar.id}')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] font-semibold text-amber-200 border border-cedar-700">
+                                        Edit
+                                    </button>
+                                    <button type="button" onclick="deleteCigarEntry('${cigar.id}', event)" class="px-2.5 py-1 rounded-lg bg-red-950/60 hover:bg-red-900/80 text-[11px] font-semibold text-red-300 border border-red-800/40">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // =========================================================================
+        // EXPORT & BACKUP FUNCTIONS (Excel .xlsx with Photos, HTML, CSV, JSON)
+        // =========================================================================
+        function openExportModal() {
+            const bytes = new Blob([localStorage.getItem(STORAGE_KEY) || '']).size;
+            const kb = (bytes / 1024).toFixed(1);
+            document.getElementById('storage-usage').textContent = `${kb} KB`;
+            updateExportDestinationUI();
+            showModal('export-modal');
+        }
+
+        function closeExportModal() {
+            hideModal('export-modal');
+        }
 
             if (saveToStorage()) {
                 closeEntryModal();
