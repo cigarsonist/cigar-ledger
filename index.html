@@ -98,8 +98,8 @@
                     <div class="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Total Spent</div>
                 </div>
                 <div class="bg-cedar-850/90 border border-cedar-800 rounded-xl px-3 py-2 text-center">
-                    <div id="stat-buy-rate" class="text-base font-bold text-emerald-400">0%</div>
-                    <div class="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Buy Again</div>
+                    <div id="stat-buy-rate" class="text-base font-bold text-emerald-400">0</div>
+                    <div class="text-[10px] uppercase tracking-wider text-stone-400 font-medium">Try Again</div>
                 </div>
             </div>
         </div>
@@ -129,11 +129,14 @@
                 <button onclick="setFilter('all')" id="filter-all" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-gold-500 text-cedar-950">
                     All
                 </button>
-                <button onclick="setFilter('yes')" id="filter-yes" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
-                    Worth Buying Again
+                <button onclick="setFilter('Need More')" id="filter-Need More" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
+                    Need More
                 </button>
-                <button onclick="setFilter('no')" id="filter-no" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
-                    Pass
+                <button onclick="setFilter('Try Again')" id="filter-Try Again" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
+                    Try Again
+                </button>
+                <button onclick="setFilter('Forget It')" id="filter-Forget It" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-cedar-800 text-stone-300 border border-cedar-700 hover:bg-cedar-700">
+                    Forget It
                 </button>
             </div>
         </div>
@@ -257,28 +260,28 @@
                         <button type="button" onclick="setSizePreset('Torpedo (6.1x52)')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] text-stone-300 border border-cedar-700">Torpedo (6.1x52)</button>
                     </div>
                 </div>
-
-                <!-- Price Paid & Date Row -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label for="cigar-price" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Price Paid ($)</label>
-                        <input type="number" id="cigar-price" step="0.01" min="0" placeholder="18.50" class="w-full px-4 py-3 rounded-xl bg-cedar-950 border border-cedar-700 text-sm text-white placeholder-stone-500 focus:outline-none focus:border-gold-500">
-                    </div>
-                    <div>
-                        <label for="cigar-date" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Date Smoked</label>
-                        <input type="date" id="cigar-date" class="w-full px-3.5 py-3 rounded-xl bg-cedar-950 border border-cedar-700 text-sm text-white focus:outline-none focus:border-gold-500">
-                    </div>
-                </div>
-
-                <!-- Worth Buying Again Toggle -->
+                <!-- Rating / Verdict Toggle (Left to Right: Need More, Try Again, Forget It) -->
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Worth Buying Again?</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button type="button" id="btn-buy-yes" onclick="setBuyAgain(true)" class="py-3 px-4 rounded-xl border-2 font-bold text-sm flex items-center justify-center gap-2 transition">
-                            <span>Yes, Buy Again</span>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1.5">Rating</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" id="btn-rating-need-more" onclick="setRating('Need More')" class="py-2.5 px-2 rounded-xl border-2 font-bold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="9"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2"/>
+                            </svg>
+                            <span>Need More</span>
                         </button>
-                        <button type="button" id="btn-buy-no" onclick="setBuyAgain(false)" class="py-3 px-4 rounded-xl border-2 font-bold text-sm flex items-center justify-center gap-2 transition">
-                            <span>No, Pass</span>
+                        <button type="button" id="btn-rating-try-again" onclick="setRating('Try Again')" class="py-2.5 px-2 rounded-xl border-2 font-bold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Try Again</span>
+                        </button>
+                        <button type="button" id="btn-rating-forget-it" onclick="setRating('Forget It')" class="py-2.5 px-2 rounded-xl border-2 font-bold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            <span>Forget It</span>
                         </button>
                     </div>
                 </div>
@@ -378,7 +381,7 @@
                                 <span id="btn-export-xlsx-title" class="font-extrabold text-sm text-cedar-950 leading-tight">Export Excel with Photos (.xlsx)</span>
                             </div>
                             <p class="text-xs text-cedar-900 font-medium mt-0.5 leading-snug">
-                                Embeds cigar photos inside spreadsheet rows with Name, Size, Price & Buy Again.
+                                Embeds cigar photos inside spreadsheet rows with Name, Size, Price & Rating.
                             </p>
                         </div>
                     </button>
@@ -474,14 +477,29 @@
         const STORAGE_KEY = 'cigar_ledger_entries_v1';
         const INIT_FLAG_KEY = 'cigar_ledger_initialized';
         let cigars = [];
-        let currentFilter = 'all'; // 'all' | 'yes' | 'no'
+        let currentFilter = 'all'; // 'all' | 'Need More' | 'Try Again' | 'Forget It'
         let searchQuery = '';
         let currentPhotoDataUrl = '';
-        let currentBuyAgain = true;
+        let currentRating = 'Need More';
 
         // Custom Export Destination State
         let selectedDirectoryHandle = null;
         let exportSaveMode = 'default'; // 'default' | 'directory' | 'ask'
+
+        // Normalize legacy entries (buyAgain: true/false or rating: 'Yes'/'No')
+        function normalizeRating(entry) {
+            if (!entry) return 'Need More';
+            if (entry.rating === 'Need More' || entry.rating === 'Try Again' || entry.rating === 'Forget It') {
+                return entry.rating;
+            }
+            if (entry.rating === 'Yes' || entry.buyAgain === true) {
+                return 'Try Again';
+            }
+            if (entry.rating === 'No' || entry.buyAgain === false) {
+                return 'Forget It';
+            }
+            return 'Need More';
+        }
 
         // Initialize app on load
         window.addEventListener('DOMContentLoaded', () => {
@@ -496,7 +514,10 @@
         function loadFromStorage() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
-                cigars = raw ? JSON.parse(raw) : [];
+                const parsed = raw ? JSON.parse(raw) : [];
+                cigars = Array.isArray(parsed)
+                    ? parsed.map(item => ({ ...item, rating: normalizeRating(item) }))
+                    : [];
             } catch (e) {
                 console.error('Failed to read storage:', e);
                 cigars = [];
@@ -552,7 +573,7 @@
                     name: 'Padron 1964 Anniversary Exclusivo',
                     size: 'Robusto (5x50)',
                     price: 22.50,
-                    buyAgain: true,
+                    rating: 'Try Again',
                     date: today,
                     notes: 'Rich cocoa, espresso, and cedar with effortless draw. Box-worthy.',
                     photo: createSampleCigarImage('Padron 1964 Anniversary', '#7f1d1d', '#f3c669')
@@ -563,9 +584,9 @@
                     name: 'Oliva Serie V Melanio',
                     size: 'Torpedo (6.1x52)',
                     price: 16.00,
-                    buyAgain: true,
+                    rating: 'Need More',
                     date: today,
-                    notes: 'Smooth leather, toasted nuts, and balanced white pepper finish.',
+                    notes: 'Smooth leather and toasted nuts—want to smoke one more with extra rest.',
                     photo: createSampleCigarImage('Oliva Serie V Melanio', '#1e3a2f', '#d99b26')
                 }
             ];
@@ -653,7 +674,7 @@
                 document.getElementById('cigar-price').value = entry.price !== null ? entry.price : '';
                 document.getElementById('cigar-date').value = entry.date || new Date().toISOString().split('T')[0];
                 document.getElementById('cigar-notes').value = entry.notes || '';
-                setBuyAgain(entry.buyAgain);
+                setRating(normalizeRating(entry));
                 if (entry.photo) {
                     currentPhotoDataUrl = entry.photo;
                     showPhotoPreview(entry.photo);
@@ -662,7 +683,7 @@
                 document.getElementById('entry-modal-title').textContent = 'Log a Cigar';
                 document.getElementById('entry-id').value = '';
                 document.getElementById('cigar-date').value = new Date().toISOString().split('T')[0];
-                setBuyAgain(true);
+                setRating('Need More');
             }
 
             document.getElementById('entry-modal').classList.remove('hidden');
@@ -676,18 +697,25 @@
             document.getElementById('cigar-size').value = preset;
         }
 
-        function setBuyAgain(value) {
-            currentBuyAgain = value;
-            const yesBtn = document.getElementById('btn-buy-yes');
-            const noBtn = document.getElementById('btn-buy-no');
+        function setRating(value) {
+            currentRating = value;
+            const needMoreBtn = document.getElementById('btn-rating-need-more');
+            const tryAgainBtn = document.getElementById('btn-rating-try-again');
+            const forgetItBtn = document.getElementById('btn-rating-forget-it');
 
-            if (value) {
-                yesBtn.className = 'py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/70 text-emerald-300 font-bold text-sm flex items-center justify-center gap-2 transition';
-                noBtn.className = 'py-3 px-4 rounded-xl border-2 border-cedar-700 bg-cedar-950 text-stone-400 font-bold text-sm flex items-center justify-center gap-2 transition';
-            } else {
-                yesBtn.className = 'py-3 px-4 rounded-xl border-2 border-cedar-700 bg-cedar-950 text-stone-400 font-bold text-sm flex items-center justify-center gap-2 transition';
-                noBtn.className = 'py-3 px-4 rounded-xl border-2 border-red-500 bg-red-950/70 text-red-300 font-bold text-sm flex items-center justify-center gap-2 transition';
-            }
+            const inactiveClass = 'py-2.5 px-2 rounded-xl border-2 border-cedar-700 bg-cedar-950 text-stone-400 font-bold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition';
+
+            needMoreBtn.className = value === 'Need More'
+                ? 'py-2.5 px-2 rounded-xl border-2 border-gold-500 bg-amber-950/70 text-gold-400 font-bold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition'
+                : inactiveClass;
+
+            tryAgainBtn.className = value === 'Try Again'
+                ? 'py-2.5 px-2 rounded-xl border-2 border-emerald-500 bg-emerald-950/70 text-emerald-300 font-bold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition'
+                : inactiveClass;
+
+            forgetItBtn.className = value === 'Forget It'
+                ? 'py-2.5 px-2 rounded-xl border-2 border-rose-500 bg-rose-950/70 text-rose-300 font-bold text-xs flex flex-col sm:flex-row items-center justify-center gap-1.5 transition'
+                : inactiveClass;
         }
 
         function saveCigarEntry(event) {
@@ -709,7 +737,7 @@
                 name,
                 size: size || 'Standard',
                 price,
-                buyAgain: currentBuyAgain,
+                rating: currentRating,
                 date,
                 notes,
                 photo: currentPhotoDataUrl || fallbackPhoto
@@ -744,6 +772,7 @@
         function openDetailModal(id) {
             const cigar = cigars.find(c => c.id === id);
             if (!cigar) return;
+            const rating = normalizeRating(cigar);
 
             document.getElementById('detail-photo').src = cigar.photo;
             document.getElementById('detail-name').textContent = cigar.name;
@@ -751,21 +780,95 @@
             document.getElementById('detail-meta').textContent = `${cigar.size || 'Standard'}  •  Smoked ${cigar.date}`;
 
             const badge = document.getElementById('detail-badge');
-            if (cigar.buyAgain) {
-                badge.textContent = 'Worth Buying Again';
+            badge.textContent = rating;
+            if (rating === 'Try Again') {
                 badge.className = 'absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md bg-emerald-950/90 text-emerald-300 border border-emerald-500/40';
+            } else if (rating === 'Forget It') {
+                badge.className = 'absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md bg-rose-950/90 text-rose-300 border border-rose-500/40';
             } else {
-                badge.textContent = 'Pass';
-                badge.className = 'absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md bg-red-950/90 text-red-300 border border-red-500/40';
+                badge.className = 'absolute bottom-3 left-4 px-3 py-1 rounded-full text-xs font-bold shadow-md bg-amber-950/90 text-gold-400 border border-gold-500/40';
             }
 
             const notesBox = document.getElementById('detail-notes-box');
-            if (cigar.notes) {
-                notesBox.classList.remove('hidden');
-                document.getElementById('detail-notes').textContent = cigar.notes;
-            } else {
-                notesBox.classList.add('hidden');
+        function getRatingBadgeHtml(rating) {
+            if (rating === 'Try Again') {
+                return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-950/90 text-emerald-300 border border-emerald-600/40">Try Again</span>`;
             }
+            if (rating === 'Forget It') {
+                return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-950/90 text-rose-300 border border-rose-600/40">Forget It</span>`;
+            }
+            return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-950/90 text-gold-400 border border-gold-500/40">Need More</span>`;
+        }
+
+        function renderApp() {
+            const total = cigars.length;
+            const totalSpent = cigars.reduce((sum, c) => sum + (Number(c.price) || 0), 0);
+            const tryAgainCount = cigars.filter(c => normalizeRating(c) === 'Try Again').length;
+
+            document.getElementById('header-count-badge').textContent = total;
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-total-spent').textContent = '$' + totalSpent.toFixed(2);
+            document.getElementById('stat-buy-rate').textContent = tryAgainCount;
+
+            const hasSamples = cigars.some(c => c.isSample);
+            document.getElementById('sample-banner').classList.toggle('hidden', !hasSamples);
+
+            const filtered = cigars.filter(c => {
+                const rating = normalizeRating(c);
+                const matchesSearch = !searchQuery || c.name.toLowerCase().includes(searchQuery);
+                const matchesFilter = currentFilter === 'all' || rating === currentFilter;
+                return matchesSearch && matchesFilter;
+            });
+
+            const listEl = document.getElementById('cigar-list');
+            const emptyEl = document.getElementById('empty-state');
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '';
+                emptyEl.classList.remove('hidden');
+                if (cigars.length > 0) {
+                    document.getElementById('empty-title').textContent = 'No Matching Cigars';
+                    document.getElementById('empty-subtitle').textContent = 'Try clearing your search term or switching filters.';
+                    document.getElementById('load-samples-btn').classList.add('hidden');
+                } else {
+                    document.getElementById('empty-title').textContent = 'Your Humidor Log is Empty';
+                    document.getElementById('empty-subtitle').textContent = "Snap a photo of the cigar you're smoking, record the size & price, and rate it.";
+                    document.getElementById('load-samples-btn').classList.remove('hidden');
+                }
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+            listEl.innerHTML = filtered.map(cigar => {
+                const rating = normalizeRating(cigar);
+                return `
+                <article onclick="openDetailModal('${cigar.id}')" class="cursor-pointer bg-cedar-900 hover:bg-cedar-850 active:scale-[0.99] transition rounded-2xl border border-cedar-800 p-3 shadow-md">
+                    <div class="flex gap-3.5 items-start">
+                        <img src="${cigar.photo}" alt="${escapeHtml(cigar.name)}" class="w-20 h-20 rounded-xl object-cover bg-cedar-950 border border-cedar-700 shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="font-serif font-bold text-base text-amber-50 truncate">${escapeHtml(cigar.name)}</h3>
+                                <span class="font-bold text-sm text-gold-400 shrink-0">$${Number(cigar.price || 0).toFixed(2)}</span>
+                            </div>
+                            <p class="text-xs text-stone-400 truncate mt-0.5">${escapeHtml(cigar.size || 'Standard')} • ${cigar.date}</p>
+                            ${cigar.notes ? `<p class="text-xs text-stone-300/90 line-clamp-1 mt-1">${escapeHtml(cigar.notes)}</p>` : ''}
+                            <div class="flex items-center justify-between gap-2 mt-2.5">
+                                ${getRatingBadgeHtml(rating)}
+                                <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+                                    <button type="button" onclick="openEntryModal('${cigar.id}')" class="px-2.5 py-1 rounded-lg bg-cedar-800 hover:bg-cedar-700 text-[11px] font-semibold text-amber-200 border border-cedar-700">
+                                        Edit
+                                    </button>
+                                    <button type="button" onclick="deleteCigarEntry('${cigar.id}', event)" class="px-2.5 py-1 rounded-lg bg-red-950/60 hover:bg-red-900/80 text-[11px] font-semibold text-red-300 border border-red-800/40">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+            }).join('');
+        }
 
             document.getElementById('detail-edit-btn').onclick = () => {
                 closeDetailModal();
@@ -1043,7 +1146,7 @@
                     { header: 'Cigar Name', key: 'name', width: 32 },
                     { header: 'Size / Vitola', key: 'size', width: 22 },
                     { header: 'Price Paid', key: 'price', width: 15 },
-                    { header: 'Worth Buying Again', key: 'buyAgain', width: 20 },
+                    { header: 'Rating', key: 'rating', width: 18 },
                     { header: 'Tasting Notes', key: 'notes', width: 42 }
                 ];
 
@@ -1073,6 +1176,7 @@
 
                 for (let i = 0; i < cigars.length; i++) {
                     const c = cigars[i];
+                    const rating = normalizeRating(c);
                     const rowIndex = i + 2;
                     const normalizedImg = await normalizeImageForExcel(c.photo);
 
@@ -1082,7 +1186,7 @@
                         name: c.name || '',
                         size: c.size || 'Standard',
                         price: Number(c.price || 0),
-                        buyAgain: c.buyAgain ? 'Yes' : 'No',
+                        rating: rating,
                         notes: c.notes || ''
                     });
 
@@ -1123,11 +1227,14 @@
                         }
 
                         if (colNumber === 6) {
+                            const ratingColor = rating === 'Try Again'
+                                ? 'FF166534'
+                                : (rating === 'Forget It' ? 'FF991B1B' : 'FFB45309');
                             cell.font = {
                                 name: 'Calibri',
                                 size: 11,
                                 bold: true,
-                                color: { argb: c.buyAgain ? 'FF166534' : 'FF991B1B' }
+                                color: { argb: ratingColor }
                             };
                         }
                     });
@@ -1167,16 +1274,17 @@
                 showToast('No cigars to export yet!');
                 return;
             }
-            const headers = ['Date', 'Cigar Name', 'Size / Vitola', 'Price Paid', 'Worth Buying Again', 'Tasting Notes'];
+            const headers = ['Date', 'Cigar Name', 'Size / Vitola', 'Price Paid', 'Rating', 'Tasting Notes'];
             const csvRows = [headers.join(',')];
 
             cigars.forEach(c => {
+                const rating = normalizeRating(c);
                 const row = [
                     `"${c.date}"`,
                     `"${(c.name || '').replace(/"/g, '""')}"`,
                     `"${(c.size || '').replace(/"/g, '""')}"`,
                     Number(c.price || 0).toFixed(2),
-                    `"${c.buyAgain ? 'Yes' : 'No'}"`,
+                    `"${rating}"`,
                     `"${(c.notes || '').replace(/"/g, '""')}"`
                 ];
                 csvRows.push(row.join(','));
@@ -1192,7 +1300,11 @@
                 showToast('No cigars to export yet!');
                 return;
             }
-            const rowsHtml = cigars.map(c => `
+            const rowsHtml = cigars.map(c => {
+                const rating = normalizeRating(c);
+                const badgeBg = rating === 'Try Again' ? '#dcfce7' : (rating === 'Forget It' ? '#fee2e2' : '#fef3c7');
+                const badgeColor = rating === 'Try Again' ? '#166534' : (rating === 'Forget It' ? '#991b1b' : '#92400e');
+                return `
                 <tr>
                     <td style="padding:12px;border-bottom:1px solid #e5e7eb;width:130px;">
                         <img src="${c.photo}" style="width:110px;height:82px;object-fit:cover;border-radius:8px;display:block;">
@@ -1201,13 +1313,14 @@
                     <td style="padding:12px;border-bottom:1px solid #e5e7eb;">${escapeHtml(c.size || '')}</td>
                     <td style="padding:12px;border-bottom:1px solid #e5e7eb;font-weight:bold;">$${Number(c.price || 0).toFixed(2)}</td>
                     <td style="padding:12px;border-bottom:1px solid #e5e7eb;">
-                        <span style="padding:4px 10px;border-radius:999px;font-size:12px;font-weight:bold;background:${c.buyAgain ? '#dcfce7' : '#fee2e2'};color:${c.buyAgain ? '#166534' : '#991b1b'};">
-                            ${c.buyAgain ? 'Yes - Buy Again' : 'No - Pass'}
+                        <span style="padding:4px 10px;border-radius:999px;font-size:12px;font-weight:bold;background:${badgeBg};color:${badgeColor};">
+                            ${rating}
                         </span>
                     </td>
                     <td style="padding:12px;border-bottom:1px solid #e5e7eb;color:#4b5563;font-size:13px;">${c.date}<br><small>${escapeHtml(c.notes || '')}</small></td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
 
             const docHtml = `<!DOCTYPE html>
 <html>
@@ -1231,7 +1344,7 @@
                 <th>Cigar Name</th>
                 <th>Size / Vitola</th>
                 <th>Price Paid</th>
-                <th>Buy Again?</th>
+                <th>Rating</th>
                 <th>Date & Tasting Notes</th>
             </tr>
         </thead>
@@ -1259,7 +1372,7 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (Array.isArray(imported)) {
-                        cigars = imported;
+                        cigars = imported.map(item => ({ ...item, rating: normalizeRating(item) }));
                         saveToStorage();
                         renderApp();
                         closeExportModal();
